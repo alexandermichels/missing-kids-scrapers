@@ -17,15 +17,12 @@ attributes = [
 
 output_file = open("NCMEC.csv", "w")
 output_csv = csv.writer(output_file)
-header_row = ["name"]+[a for a in attributes]+["narrative"]
+header_row = ["casenumber", "name", "url"] + [a for a in attributes] + ["narrative"]
 output_csv.writerow(header_row)
 
 # open URL and click submit
 search_url = "https://www.missingkids.org/gethelpnow/search/poster-results"
 chrome_options = Options()
-#chrome_options.add_argument("--disable-extensions")
-#chrome_options.add_argument("--disable-gpu")
-#chrome_options.add_argument("--no-sandbox") # linux only
 chrome_options.add_argument("--headless")
 driver = webdriver.Chrome(executable_path="./webdrivers/chromedriver", options=chrome_options)
 
@@ -49,6 +46,8 @@ while another_page:
             name.click()
             time.sleep(5)  # wait for the page to load
             driver.switch_to.window(driver.window_handles[1])
+            casenumber = driver.find_element_by_class_name("caseNumber").text
+            url = driver.current_url
             attributes_list = driver.find_element_by_class_name("mkPersonAttributes")
             info_dict = {}
             for attribute in attributes:
@@ -63,7 +62,7 @@ while another_page:
                     print(attribute_info.get_attribute("innerHTML"))
             print(info_dict)
             narrative = driver.find_element_by_class_name("narrativeTextBlock").text
-            to_write = [name_val] + [info_dict[a] for a in attributes] + [narrative]
+            to_write = [casenumber, name_val, url] + [info_dict[a] for a in attributes] + [narrative]
             output_csv.writerow(to_write)
             output_file.flush()
         except Exception as e:
