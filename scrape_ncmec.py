@@ -15,8 +15,8 @@ attributes = [
     "weight"
             ]
 
-output_file = "NCMEC.csv"
-output_csv = csv.writer(open(output_file, "w"))
+output_file = open("NCMEC.csv", "w")
+output_csv = csv.writer(output_file)
 header_row = ["name"]+[a for a in attributes]+["narrative"]
 output_csv.writerow(header_row)
 
@@ -65,10 +65,11 @@ while another_page:
             narrative = driver.find_element_by_class_name("narrativeTextBlock").text
             to_write = [name_val] + [info_dict[a] for a in attributes] + [narrative]
             output_csv.writerow(to_write)
+            output_file.flush()
         except Exception as e:
             print(e)
             print(driver.current_url)
-            #print(driver.find_element_by_tag_name("body").get_attribute("innerHTML"))
+            # print(driver.find_element_by_tag_name("body").get_attribute("innerHTML"))
             print(elem.get_attribute("innerHTML"))
         driver.close()
         driver.switch_to.window(driver.window_handles[0])
@@ -87,3 +88,4 @@ while another_page:
     next_button = driver.find_element_by_xpath("//*[@id='pagination-demo']/ul/li[6]/a")
     next_button.click()
     time.sleep(3)
+output_file.close()
